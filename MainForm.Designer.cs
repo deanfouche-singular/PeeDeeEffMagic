@@ -43,13 +43,13 @@
       lblDragAndDrop = new Label();
       splitContainer1 = new SplitContainer();
       groupBox1 = new GroupBox();
+      checkBox1 = new CheckBox();
       cBoxExtractSignatures = new CheckBox();
       cBoxFlattenPartial = new CheckBox();
       cBoxSign = new CheckBox();
       splitContainer2 = new SplitContainer();
       groupBox2 = new GroupBox();
       cBoxExportFieldsCsv = new CheckBox();
-      checkBox1 = new CheckBox();
       ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
       splitContainer1.Panel1.SuspendLayout();
       splitContainer1.Panel2.SuspendLayout();
@@ -233,6 +233,16 @@
       groupBox1.TabStop = false;
       groupBox1.Text = "Modifications";
       // 
+      // checkBox1
+      // 
+      checkBox1.AutoSize = true;
+      checkBox1.Location = new Point(108, 86);
+      checkBox1.Name = "checkBox1";
+      checkBox1.Size = new Size(132, 24);
+      checkBox1.TabIndex = 10;
+      checkBox1.Text = "Show Revisions";
+      checkBox1.UseVisualStyleBackColor = true;
+      // 
       // cBoxExtractSignatures
       // 
       cBoxExtractSignatures.AutoSize = true;
@@ -301,16 +311,6 @@
       cBoxExportFieldsCsv.TabIndex = 5;
       cBoxExportFieldsCsv.Text = "Export Fields (csv)";
       cBoxExportFieldsCsv.UseVisualStyleBackColor = true;
-      // 
-      // checkBox1
-      // 
-      checkBox1.AutoSize = true;
-      checkBox1.Location = new Point(108, 86);
-      checkBox1.Name = "checkBox1";
-      checkBox1.Size = new Size(140, 24);
-      checkBox1.TabIndex = 10;
-      checkBox1.Text = "Show Revisiohns";
-      checkBox1.UseVisualStyleBackColor = true;
       // 
       // MainForm
       // 

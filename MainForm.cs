@@ -104,6 +104,18 @@ namespace PeeDeeEffMagic
         mods = $"{mods}_FlatIron";
       }
 
+      if (cBoxFlattenPartial.Checked)
+      {
+        // TODO: expand to allow user to select which pages to flatten
+        PdfDocument flattenedPages = document.CopyPage(0);
+        PdfDocument unchangedPages = document.CopyPages([1, 2, 3]);
+
+        flattenedPages.Flatten();
+
+        document = PdfDocument.Merge(flattenedPages, unchangedPages);
+        mods = $"{mods}_PartialFlatIron";
+      }
+
       if (cBoxExportFieldsCsv.Checked)
       {
         this.WriteSectionBreak();
@@ -129,6 +141,16 @@ namespace PeeDeeEffMagic
         mods = $"{mods}_CustomFlatIron";
       }
 
+      if (cBoxRevise.Checked)
+      {
+        mods = $"{mods}_Revised";
+      }
+
+      if (cBoxSign.Checked)
+      {
+        mods = $"{mods}_Signed";
+      }
+
       if (!string.IsNullOrWhiteSpace(mods))
       {
         var outputFilePath = Path.Combine(outputPath, $"{fileInfo.Name.Replace("_CustomFlatIron", "").Replace(".pdf", "")}{mods}.pdf");
@@ -145,7 +167,6 @@ namespace PeeDeeEffMagic
 
         if (cBoxRevise.Checked)
         {
-          mods = $"{mods}_Revised";
           outputFilePath = Path.Combine(outputPath, $"{fileInfo.Name.Replace("_CustomFlatIron", "").Replace(".pdf", "")}{mods}.pdf");
           document = document.SaveAsRevision(outputFilePath);
 
@@ -154,7 +175,6 @@ namespace PeeDeeEffMagic
 
         if (cBoxSign.Checked)
         {
-          mods = $"{mods}_Signed";
           outputFilePath = Path.Combine(outputPath, $"{fileInfo.Name.Replace("_CustomFlatIron", "").Replace(".pdf", "")}{mods}.pdf");
           document.SignWithFile($"C:\\Users\\DFouche\\Documents\\Personal Docs\\Coding Exercises and tings\\MySignature.pfx",
                                 "bZQBjzHlm77YfhxuF6M2",

@@ -50,6 +50,10 @@
       splitContainer2 = new SplitContainer();
       groupBox2 = new GroupBox();
       cBoxExportFieldsCsv = new CheckBox();
+      panel1 = new Panel();
+      gBoxLibraries = new GroupBox();
+      radioButton1 = new RadioButton();
+      cBoxEdit = new CheckBox();
       ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
       splitContainer1.Panel1.SuspendLayout();
       splitContainer1.Panel2.SuspendLayout();
@@ -60,6 +64,8 @@
       splitContainer2.Panel2.SuspendLayout();
       splitContainer2.SuspendLayout();
       groupBox2.SuspendLayout();
+      panel1.SuspendLayout();
+      gBoxLibraries.SuspendLayout();
       SuspendLayout();
       // 
       // txtFilePath
@@ -67,7 +73,7 @@
       txtFilePath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
       txtFilePath.Location = new Point(132, 20);
       txtFilePath.Name = "txtFilePath";
-      txtFilePath.Size = new Size(522, 27);
+      txtFilePath.Size = new Size(422, 27);
       txtFilePath.TabIndex = 0;
       txtFilePath.TextChanged += txtFilePath_TextChanged;
       // 
@@ -77,7 +83,7 @@
       btnProcess.Location = new Point(3, 3);
       btnProcess.MinimumSize = new Size(95, 30);
       btnProcess.Name = "btnProcess";
-      btnProcess.Size = new Size(147, 146);
+      btnProcess.Size = new Size(125, 146);
       btnProcess.TabIndex = 1;
       btnProcess.Text = "Process file";
       btnProcess.UseVisualStyleBackColor = true;
@@ -126,7 +132,7 @@
       // btnFilePath
       // 
       btnFilePath.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-      btnFilePath.Location = new Point(660, 20);
+      btnFilePath.Location = new Point(560, 20);
       btnFilePath.Name = "btnFilePath";
       btnFilePath.Size = new Size(30, 30);
       btnFilePath.TabIndex = 5;
@@ -137,7 +143,7 @@
       // btnOutputPath
       // 
       btnOutputPath.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-      btnOutputPath.Location = new Point(660, 119);
+      btnOutputPath.Location = new Point(560, 119);
       btnOutputPath.Name = "btnOutputPath";
       btnOutputPath.Size = new Size(30, 30);
       btnOutputPath.TabIndex = 6;
@@ -150,7 +156,7 @@
       txtOutputPath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
       txtOutputPath.Location = new Point(132, 121);
       txtOutputPath.Name = "txtOutputPath";
-      txtOutputPath.Size = new Size(522, 27);
+      txtOutputPath.Size = new Size(422, 27);
       txtOutputPath.TabIndex = 7;
       txtOutputPath.TextChanged += txtOutputPath_TextChanged;
       // 
@@ -177,9 +183,9 @@
       rTxtOutputDialog.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       rTxtOutputDialog.BackColor = SystemColors.InfoText;
       rTxtOutputDialog.ForeColor = Color.LimeGreen;
-      rTxtOutputDialog.Location = new Point(19, 339);
+      rTxtOutputDialog.Location = new Point(19, 375);
       rTxtOutputDialog.Name = "rTxtOutputDialog";
-      rTxtOutputDialog.Size = new Size(671, 244);
+      rTxtOutputDialog.Size = new Size(571, 222);
       rTxtOutputDialog.TabIndex = 10;
       rTxtOutputDialog.Text = "";
       rTxtOutputDialog.TextChanged += rTxtOutputDialog_TextChanged;
@@ -192,7 +198,7 @@
       lblDragAndDrop.BorderStyle = BorderStyle.Fixed3D;
       lblDragAndDrop.Location = new Point(19, 54);
       lblDragAndDrop.Name = "lblDragAndDrop";
-      lblDragAndDrop.Size = new Size(671, 64);
+      lblDragAndDrop.Size = new Size(571, 64);
       lblDragAndDrop.TabIndex = 11;
       lblDragAndDrop.Text = "Drag and Drop file area";
       lblDragAndDrop.TextAlign = ContentAlignment.MiddleCenter;
@@ -202,7 +208,7 @@
       // splitContainer1
       // 
       splitContainer1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-      splitContainer1.Location = new Point(19, 155);
+      splitContainer1.Location = new Point(19, 220);
       splitContainer1.Name = "splitContainer1";
       // 
       // splitContainer1.Panel1
@@ -212,13 +218,14 @@
       // splitContainer1.Panel2
       // 
       splitContainer1.Panel2.Controls.Add(splitContainer2);
-      splitContainer1.Size = new Size(671, 149);
-      splitContainer1.SplitterDistance = 284;
+      splitContainer1.Size = new Size(571, 149);
+      splitContainer1.SplitterDistance = 240;
       splitContainer1.TabIndex = 14;
       // 
       // groupBox1
       // 
       groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+      groupBox1.Controls.Add(cBoxEdit);
       groupBox1.Controls.Add(checkBox1);
       groupBox1.Controls.Add(cBoxExtractSignatures);
       groupBox1.Controls.Add(cBoxFlattenPartial);
@@ -228,7 +235,7 @@
       groupBox1.Controls.Add(cBoxRevise);
       groupBox1.Location = new Point(3, 3);
       groupBox1.Name = "groupBox1";
-      groupBox1.Size = new Size(278, 143);
+      groupBox1.Size = new Size(234, 143);
       groupBox1.TabIndex = 15;
       groupBox1.TabStop = false;
       groupBox1.Text = "Modifications";
@@ -286,8 +293,8 @@
       // splitContainer2.Panel2
       // 
       splitContainer2.Panel2.Controls.Add(btnProcess);
-      splitContainer2.Size = new Size(383, 149);
-      splitContainer2.SplitterDistance = 226;
+      splitContainer2.Size = new Size(327, 149);
+      splitContainer2.SplitterDistance = 192;
       splitContainer2.TabIndex = 0;
       // 
       // groupBox2
@@ -297,7 +304,7 @@
       groupBox2.Controls.Add(cBoxReadFields);
       groupBox2.Location = new Point(3, 3);
       groupBox2.Name = "groupBox2";
-      groupBox2.Size = new Size(220, 143);
+      groupBox2.Size = new Size(186, 143);
       groupBox2.TabIndex = 15;
       groupBox2.TabStop = false;
       groupBox2.Text = "Output Options";
@@ -312,12 +319,53 @@
       cBoxExportFieldsCsv.Text = "Export Fields (csv)";
       cBoxExportFieldsCsv.UseVisualStyleBackColor = true;
       // 
+      // panel1
+      // 
+      panel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+      panel1.Controls.Add(gBoxLibraries);
+      panel1.Location = new Point(19, 154);
+      panel1.Name = "panel1";
+      panel1.Size = new Size(571, 63);
+      panel1.TabIndex = 15;
+      // 
+      // gBoxLibraries
+      // 
+      gBoxLibraries.Controls.Add(radioButton1);
+      gBoxLibraries.Location = new Point(3, 3);
+      gBoxLibraries.Name = "gBoxLibraries";
+      gBoxLibraries.Size = new Size(582, 57);
+      gBoxLibraries.TabIndex = 0;
+      gBoxLibraries.TabStop = false;
+      gBoxLibraries.Text = "Libraries";
+      // 
+      // radioButton1
+      // 
+      radioButton1.AutoSize = true;
+      radioButton1.Location = new Point(12, 25);
+      radioButton1.Name = "radioButton1";
+      radioButton1.Size = new Size(117, 24);
+      radioButton1.TabIndex = 0;
+      radioButton1.TabStop = true;
+      radioButton1.Text = "radioButton1";
+      radioButton1.UseVisualStyleBackColor = true;
+      // 
+      // cBoxEdit
+      // 
+      cBoxEdit.AutoSize = true;
+      cBoxEdit.Location = new Point(108, 56);
+      cBoxEdit.Name = "cBoxEdit";
+      cBoxEdit.Size = new Size(57, 24);
+      cBoxEdit.TabIndex = 11;
+      cBoxEdit.Text = "Edit";
+      cBoxEdit.UseVisualStyleBackColor = true;
+      // 
       // MainForm
       // 
       AllowDrop = true;
       AutoScaleDimensions = new SizeF(8F, 20F);
       AutoScaleMode = AutoScaleMode.Font;
-      ClientSize = new Size(702, 595);
+      ClientSize = new Size(602, 609);
+      Controls.Add(panel1);
       Controls.Add(splitContainer1);
       Controls.Add(lblDragAndDrop);
       Controls.Add(rTxtOutputDialog);
@@ -344,6 +392,9 @@
       splitContainer2.ResumeLayout(false);
       groupBox2.ResumeLayout(false);
       groupBox2.PerformLayout();
+      panel1.ResumeLayout(false);
+      gBoxLibraries.ResumeLayout(false);
+      gBoxLibraries.PerformLayout();
       ResumeLayout(false);
       PerformLayout();
     }
@@ -372,5 +423,9 @@
     private GroupBox groupBox2;
     private CheckBox cBoxExtractSignatures;
     private CheckBox checkBox1;
+    private Panel panel1;
+    private GroupBox gBoxLibraries;
+    private RadioButton radioButton1;
+    private CheckBox cBoxEdit;
   }
 }

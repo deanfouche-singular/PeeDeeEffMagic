@@ -28,8 +28,8 @@
     /// </summary>
     private void InitializeComponent()
     {
-      listBox1 = new ListBox();
-      listBox2 = new ListBox();
+      lBoxExistingFields = new ListBox();
+      lBoxSelectedFields = new ListBox();
       btnRight = new Button();
       btnLeft = new Button();
       splitContainer1 = new SplitContainer();
@@ -47,25 +47,27 @@
       splitContainer2.SuspendLayout();
       SuspendLayout();
       // 
-      // listBox1
+      // lBoxExistingFields
       // 
-      listBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-      listBox1.FormattingEnabled = true;
-      listBox1.Location = new Point(4, 23);
-      listBox1.MinimumSize = new Size(250, 0);
-      listBox1.Name = "listBox1";
-      listBox1.Size = new Size(252, 344);
-      listBox1.TabIndex = 0;
+      lBoxExistingFields.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+      lBoxExistingFields.FormattingEnabled = true;
+      lBoxExistingFields.Location = new Point(4, 23);
+      lBoxExistingFields.MinimumSize = new Size(250, 0);
+      lBoxExistingFields.Name = "lBoxExistingFields";
+      lBoxExistingFields.SelectionMode = SelectionMode.MultiExtended;
+      lBoxExistingFields.Size = new Size(252, 344);
+      lBoxExistingFields.TabIndex = 0;
       // 
-      // listBox2
+      // lBoxSelectedFields
       // 
-      listBox2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-      listBox2.FormattingEnabled = true;
-      listBox2.Location = new Point(3, 23);
-      listBox2.MinimumSize = new Size(250, 0);
-      listBox2.Name = "listBox2";
-      listBox2.Size = new Size(254, 344);
-      listBox2.TabIndex = 1;
+      lBoxSelectedFields.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+      lBoxSelectedFields.FormattingEnabled = true;
+      lBoxSelectedFields.Location = new Point(3, 23);
+      lBoxSelectedFields.MinimumSize = new Size(250, 0);
+      lBoxSelectedFields.Name = "lBoxSelectedFields";
+      lBoxSelectedFields.SelectionMode = SelectionMode.MultiExtended;
+      lBoxSelectedFields.Size = new Size(254, 344);
+      lBoxSelectedFields.TabIndex = 1;
       // 
       // btnRight
       // 
@@ -78,6 +80,7 @@
       btnRight.TabIndex = 2;
       btnRight.Text = ">>";
       btnRight.UseVisualStyleBackColor = true;
+      btnRight.Click += btnRight_Click;
       // 
       // btnLeft
       // 
@@ -90,6 +93,7 @@
       btnLeft.TabIndex = 3;
       btnLeft.Text = "<<";
       btnLeft.UseVisualStyleBackColor = true;
+      btnLeft.Click += btnLeft_Click;
       // 
       // splitContainer1
       // 
@@ -100,7 +104,7 @@
       // splitContainer1.Panel1
       // 
       splitContainer1.Panel1.Controls.Add(label1);
-      splitContainer1.Panel1.Controls.Add(listBox1);
+      splitContainer1.Panel1.Controls.Add(lBoxExistingFields);
       // 
       // splitContainer1.Panel2
       // 
@@ -132,7 +136,7 @@
       // splitContainer2.Panel2
       // 
       splitContainer2.Panel2.Controls.Add(label2);
-      splitContainer2.Panel2.Controls.Add(listBox2);
+      splitContainer2.Panel2.Controls.Add(lBoxSelectedFields);
       splitContainer2.Size = new Size(322, 372);
       splitContainer2.SplitterDistance = 59;
       splitContainer2.TabIndex = 0;
@@ -142,9 +146,9 @@
       label2.AutoSize = true;
       label2.Location = new Point(3, 0);
       label2.Name = "label2";
-      label2.Size = new Size(188, 20);
+      label2.Size = new Size(106, 20);
       label2.TabIndex = 6;
-      label2.Text = "Fields flagged for readonly";
+      label2.Text = "Selected fields";
       // 
       // btnContinue
       // 
@@ -155,6 +159,7 @@
       btnContinue.TabIndex = 4;
       btnContinue.Text = "Continue";
       btnContinue.UseVisualStyleBackColor = true;
+      btnContinue.Click += btnContinue_Click;
       // 
       // FieldSelectorForm
       // 
@@ -165,6 +170,7 @@
       Controls.Add(splitContainer1);
       MinimumSize = new Size(610, 500);
       Name = "FieldSelectorForm";
+      StartPosition = FormStartPosition.CenterParent;
       Text = "Field Selector";
       splitContainer1.Panel1.ResumeLayout(false);
       splitContainer1.Panel1.PerformLayout();
@@ -181,8 +187,8 @@
 
     #endregion
 
-    private ListBox listBox1;
-    private ListBox listBox2;
+    private ListBox lBoxExistingFields;
+    private ListBox lBoxSelectedFields;
     private Button btnRight;
     private Button btnLeft;
     private SplitContainer splitContainer1;

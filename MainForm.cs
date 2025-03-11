@@ -3,6 +3,7 @@ namespace PeeDeeEffMagic
   using IronPdf.Rendering;
   using IronPdf.Signing;
   using IronSoftware.Pdfium;
+  using PeeDeeEffMagic.Popup;
 
   public partial class MainForm : Form
   {
@@ -95,6 +96,50 @@ namespace PeeDeeEffMagic
 
       var mods = string.Empty;
 
+      if (cBoxEdit.Checked)
+      {
+        this.WriteSectionBreak();
+        this.WriteToOutput("Editing form fields...");
+
+        List<string> allFieldNames = [];
+
+        foreach (var field in document.Form)
+        {
+          allFieldNames.Add(field.Name);
+        }
+
+        string[] fieldsToEdit = [];
+
+        using (FieldSelectorForm fieldSelector = new FieldSelectorForm("Edit fields", allFieldNames.ToArray()))
+        {
+          if (fieldSelector.ShowDialog() == DialogResult.OK)
+          {
+            fieldsToEdit = fieldSelector.SelectedFields;
+            this.WriteToOutput($"Fields selected for editing: {string.Join(", ", fieldsToEdit)}");
+          }
+        }
+
+        foreach (var fieldName in fieldsToEdit)
+        {
+          var fieldToEdit = document.Form.FindFormField(fieldName);
+          if (fieldToEdit != null && fieldToEdit.Type == PdfFormFieldType.Textfield)
+          {
+            using (TextInputForm textInput = new TextInputForm(fieldName, fieldToEdit.Value))
+            {
+              if (textInput.ShowDialog() == DialogResult.OK)
+              {
+                var fieldValue = textInput.FieldValue;
+                this.WriteToOutput($"Field: {fieldName} - Value: {fieldValue}");
+                var field = document.Form.FindFormField(fieldName);
+                field.Value = fieldValue;
+              }
+            }
+          }
+        }
+
+        mods = $"{mods}_CustomEditIron";
+      }
+
       if (cBoxFlatten.Checked)
       {
         this.WriteSectionBreak();
@@ -135,8 +180,24 @@ namespace PeeDeeEffMagic
         this.WriteSectionBreak();
         this.WriteToOutput("Custom flattening form fields...");
 
-        // List of fields to flatten (modify as needed)
-        string[] fieldsToFlatten = { "@schemeName", "@employerName", "@schemeNo", "@phoneNumber", "@memberNo", "@payrollNo", "@firstName", "@nationalIdNo", "@telephoneNo", "@relationship", "@emailAddress", "@lastName", "@firstName", "@employmentDate" };
+        List<string> allFieldNames = [];
+
+        foreach (var field in document.Form)
+        {
+          allFieldNames.Add(field.Name);
+        }
+
+        string[] fieldsToFlatten = [];
+
+        using (FieldSelectorForm fieldSelector = new FieldSelectorForm("Set as readonly", allFieldNames.ToArray())) // Ensure proper disposal
+        {
+          if (fieldSelector.ShowDialog() == DialogResult.OK) // Blocks execution until Form2 is closed
+          {
+            fieldsToFlatten = fieldSelector.SelectedFields; // Retrieve input from Form2
+            this.WriteToOutput($"Fields selected for flattening: {string.Join(", ", fieldsToFlatten)}");
+          }
+        }
+
         this.FlattenFields(document, fieldsToFlatten);
         mods = $"{mods}_CustomFlatIron";
       }
@@ -280,16 +341,16 @@ namespace PeeDeeEffMagic
           if (cBoxCustomFlatten.Checked && field.Type == PdfFormFieldType.Textfield && !field.ReadOnly && Array.Exists(fieldNames, f => f == field.Name))
           {
             // Get the field's value
-            string fieldValue = field.Name; // field.Value;
+            //string fieldValue = field.Value;
             //string utf8Value = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(fieldValue));
-            field.Value = string.Empty;
+            //field.Value = string.Empty;
 
             // Remove the field and replace it with static text
             field.ReadOnly = true;
-            this.WriteToOutput($"Flattening field: {field.Name} with value: {fieldValue}.");
+            this.WriteToOutput($"Flattening field: {field.Name} with value: {field.Value}.");
 
             // Create a text annotation at the same position (as a workaround)
-            document.DrawText(fieldValue, font, FontSize: fontSize, PageIndex: (int)field.PageIndex, X: field.X, Y: field.Y, Color: Color.Black, Rotation: 0.0);
+            //document.DrawText(fieldValue, font, FontSize: fontSize, PageIndex: (int)field.PageIndex, X: field.X, Y: field.Y, Color: Color.Black, Rotation: 0.0);
           }
         }
       }

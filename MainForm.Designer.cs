@@ -43,17 +43,20 @@
       lblDragAndDrop = new Label();
       splitContainer1 = new SplitContainer();
       groupBox1 = new GroupBox();
-      checkBox1 = new CheckBox();
+      cBoxPreSave = new CheckBox();
+      cBoxEdit = new CheckBox();
+      cBoxShowRevisions = new CheckBox();
       cBoxExtractSignatures = new CheckBox();
       cBoxFlattenPartial = new CheckBox();
       cBoxSign = new CheckBox();
       splitContainer2 = new SplitContainer();
       groupBox2 = new GroupBox();
+      cBoxConvertHtml = new CheckBox();
       cBoxExportFieldsCsv = new CheckBox();
       panel1 = new Panel();
       gBoxLibraries = new GroupBox();
-      radioButton1 = new RadioButton();
-      cBoxEdit = new CheckBox();
+      rBtnIText = new RadioButton();
+      rBtnIronPDF = new RadioButton();
       ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
       splitContainer1.Panel1.SuspendLayout();
       splitContainer1.Panel2.SuspendLayout();
@@ -73,7 +76,7 @@
       txtFilePath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
       txtFilePath.Location = new Point(132, 20);
       txtFilePath.Name = "txtFilePath";
-      txtFilePath.Size = new Size(422, 27);
+      txtFilePath.Size = new Size(802, 27);
       txtFilePath.TabIndex = 0;
       txtFilePath.TextChanged += txtFilePath_TextChanged;
       // 
@@ -83,7 +86,7 @@
       btnProcess.Location = new Point(3, 3);
       btnProcess.MinimumSize = new Size(95, 30);
       btnProcess.Name = "btnProcess";
-      btnProcess.Size = new Size(125, 146);
+      btnProcess.Size = new Size(219, 146);
       btnProcess.TabIndex = 1;
       btnProcess.Text = "Process file";
       btnProcess.UseVisualStyleBackColor = true;
@@ -92,7 +95,7 @@
       // cBoxFlatten
       // 
       cBoxFlatten.AutoSize = true;
-      cBoxFlatten.Location = new Point(12, 26);
+      cBoxFlatten.Location = new Point(12, 113);
       cBoxFlatten.Name = "cBoxFlatten";
       cBoxFlatten.Size = new Size(76, 24);
       cBoxFlatten.TabIndex = 2;
@@ -102,7 +105,9 @@
       // cBoxRevise
       // 
       cBoxRevise.AutoSize = true;
-      cBoxRevise.Location = new Point(12, 86);
+      cBoxRevise.Checked = true;
+      cBoxRevise.CheckState = CheckState.Checked;
+      cBoxRevise.Location = new Point(12, 56);
       cBoxRevise.Name = "cBoxRevise";
       cBoxRevise.Size = new Size(73, 24);
       cBoxRevise.TabIndex = 5;
@@ -112,7 +117,9 @@
       // cBoxCustomFlatten
       // 
       cBoxCustomFlatten.AutoSize = true;
-      cBoxCustomFlatten.Location = new Point(12, 56);
+      cBoxCustomFlatten.Checked = true;
+      cBoxCustomFlatten.CheckState = CheckState.Checked;
+      cBoxCustomFlatten.Location = new Point(246, 26);
       cBoxCustomFlatten.Name = "cBoxCustomFlatten";
       cBoxCustomFlatten.Size = new Size(93, 24);
       cBoxCustomFlatten.TabIndex = 4;
@@ -132,7 +139,7 @@
       // btnFilePath
       // 
       btnFilePath.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-      btnFilePath.Location = new Point(560, 20);
+      btnFilePath.Location = new Point(940, 20);
       btnFilePath.Name = "btnFilePath";
       btnFilePath.Size = new Size(30, 30);
       btnFilePath.TabIndex = 5;
@@ -143,7 +150,7 @@
       // btnOutputPath
       // 
       btnOutputPath.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-      btnOutputPath.Location = new Point(560, 119);
+      btnOutputPath.Location = new Point(940, 119);
       btnOutputPath.Name = "btnOutputPath";
       btnOutputPath.Size = new Size(30, 30);
       btnOutputPath.TabIndex = 6;
@@ -156,7 +163,7 @@
       txtOutputPath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
       txtOutputPath.Location = new Point(132, 121);
       txtOutputPath.Name = "txtOutputPath";
-      txtOutputPath.Size = new Size(422, 27);
+      txtOutputPath.Size = new Size(802, 27);
       txtOutputPath.TabIndex = 7;
       txtOutputPath.TextChanged += txtOutputPath_TextChanged;
       // 
@@ -185,7 +192,7 @@
       rTxtOutputDialog.ForeColor = Color.LimeGreen;
       rTxtOutputDialog.Location = new Point(19, 375);
       rTxtOutputDialog.Name = "rTxtOutputDialog";
-      rTxtOutputDialog.Size = new Size(571, 222);
+      rTxtOutputDialog.Size = new Size(951, 222);
       rTxtOutputDialog.TabIndex = 10;
       rTxtOutputDialog.Text = "";
       rTxtOutputDialog.TextChanged += rTxtOutputDialog_TextChanged;
@@ -198,7 +205,7 @@
       lblDragAndDrop.BorderStyle = BorderStyle.Fixed3D;
       lblDragAndDrop.Location = new Point(19, 54);
       lblDragAndDrop.Name = "lblDragAndDrop";
-      lblDragAndDrop.Size = new Size(571, 64);
+      lblDragAndDrop.Size = new Size(951, 64);
       lblDragAndDrop.TabIndex = 11;
       lblDragAndDrop.Text = "Drag and Drop file area";
       lblDragAndDrop.TextAlign = ContentAlignment.MiddleCenter;
@@ -218,15 +225,16 @@
       // splitContainer1.Panel2
       // 
       splitContainer1.Panel2.Controls.Add(splitContainer2);
-      splitContainer1.Size = new Size(571, 149);
-      splitContainer1.SplitterDistance = 240;
+      splitContainer1.Size = new Size(951, 149);
+      splitContainer1.SplitterDistance = 397;
       splitContainer1.TabIndex = 14;
       // 
       // groupBox1
       // 
       groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+      groupBox1.Controls.Add(cBoxPreSave);
       groupBox1.Controls.Add(cBoxEdit);
-      groupBox1.Controls.Add(checkBox1);
+      groupBox1.Controls.Add(cBoxShowRevisions);
       groupBox1.Controls.Add(cBoxExtractSignatures);
       groupBox1.Controls.Add(cBoxFlattenPartial);
       groupBox1.Controls.Add(cBoxSign);
@@ -235,25 +243,49 @@
       groupBox1.Controls.Add(cBoxRevise);
       groupBox1.Location = new Point(3, 3);
       groupBox1.Name = "groupBox1";
-      groupBox1.Size = new Size(234, 143);
+      groupBox1.Size = new Size(391, 143);
       groupBox1.TabIndex = 15;
       groupBox1.TabStop = false;
       groupBox1.Text = "Modifications";
       // 
-      // checkBox1
+      // cBoxPreSave
       // 
-      checkBox1.AutoSize = true;
-      checkBox1.Location = new Point(108, 86);
-      checkBox1.Name = "checkBox1";
-      checkBox1.Size = new Size(132, 24);
-      checkBox1.TabIndex = 10;
-      checkBox1.Text = "Show Revisions";
-      checkBox1.UseVisualStyleBackColor = true;
+      cBoxPreSave.AutoSize = true;
+      cBoxPreSave.Checked = true;
+      cBoxPreSave.CheckState = CheckState.Checked;
+      cBoxPreSave.Location = new Point(12, 26);
+      cBoxPreSave.Name = "cBoxPreSave";
+      cBoxPreSave.Size = new Size(87, 24);
+      cBoxPreSave.TabIndex = 12;
+      cBoxPreSave.Text = "Pre-save";
+      cBoxPreSave.UseVisualStyleBackColor = true;
+      // 
+      // cBoxEdit
+      // 
+      cBoxEdit.AutoSize = true;
+      cBoxEdit.Checked = true;
+      cBoxEdit.CheckState = CheckState.Checked;
+      cBoxEdit.Location = new Point(108, 26);
+      cBoxEdit.Name = "cBoxEdit";
+      cBoxEdit.Size = new Size(57, 24);
+      cBoxEdit.TabIndex = 11;
+      cBoxEdit.Text = "Edit";
+      cBoxEdit.UseVisualStyleBackColor = true;
+      // 
+      // cBoxShowRevisions
+      // 
+      cBoxShowRevisions.AutoSize = true;
+      cBoxShowRevisions.Location = new Point(108, 56);
+      cBoxShowRevisions.Name = "cBoxShowRevisions";
+      cBoxShowRevisions.Size = new Size(132, 24);
+      cBoxShowRevisions.TabIndex = 10;
+      cBoxShowRevisions.Text = "Show Revisions";
+      cBoxShowRevisions.UseVisualStyleBackColor = true;
       // 
       // cBoxExtractSignatures
       // 
       cBoxExtractSignatures.AutoSize = true;
-      cBoxExtractSignatures.Location = new Point(108, 115);
+      cBoxExtractSignatures.Location = new Point(108, 83);
       cBoxExtractSignatures.Name = "cBoxExtractSignatures";
       cBoxExtractSignatures.Size = new Size(112, 24);
       cBoxExtractSignatures.TabIndex = 9;
@@ -263,7 +295,7 @@
       // cBoxFlattenPartial
       // 
       cBoxFlattenPartial.AutoSize = true;
-      cBoxFlattenPartial.Location = new Point(108, 26);
+      cBoxFlattenPartial.Location = new Point(108, 113);
       cBoxFlattenPartial.Name = "cBoxFlattenPartial";
       cBoxFlattenPartial.Size = new Size(118, 24);
       cBoxFlattenPartial.TabIndex = 8;
@@ -273,7 +305,7 @@
       // cBoxSign
       // 
       cBoxSign.AutoSize = true;
-      cBoxSign.Location = new Point(12, 115);
+      cBoxSign.Location = new Point(12, 86);
       cBoxSign.Name = "cBoxSign";
       cBoxSign.Size = new Size(60, 24);
       cBoxSign.TabIndex = 7;
@@ -293,21 +325,32 @@
       // splitContainer2.Panel2
       // 
       splitContainer2.Panel2.Controls.Add(btnProcess);
-      splitContainer2.Size = new Size(327, 149);
-      splitContainer2.SplitterDistance = 192;
+      splitContainer2.Size = new Size(550, 149);
+      splitContainer2.SplitterDistance = 321;
       splitContainer2.TabIndex = 0;
       // 
       // groupBox2
       // 
       groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+      groupBox2.Controls.Add(cBoxConvertHtml);
       groupBox2.Controls.Add(cBoxExportFieldsCsv);
       groupBox2.Controls.Add(cBoxReadFields);
       groupBox2.Location = new Point(3, 3);
       groupBox2.Name = "groupBox2";
-      groupBox2.Size = new Size(186, 143);
+      groupBox2.Size = new Size(315, 143);
       groupBox2.TabIndex = 15;
       groupBox2.TabStop = false;
       groupBox2.Text = "Output Options";
+      // 
+      // cBoxConvertHtml
+      // 
+      cBoxConvertHtml.AutoSize = true;
+      cBoxConvertHtml.Location = new Point(6, 86);
+      cBoxConvertHtml.Name = "cBoxConvertHtml";
+      cBoxConvertHtml.Size = new Size(141, 24);
+      cBoxConvertHtml.TabIndex = 6;
+      cBoxConvertHtml.Text = "Html Conversion";
+      cBoxConvertHtml.UseVisualStyleBackColor = true;
       // 
       // cBoxExportFieldsCsv
       // 
@@ -325,12 +368,13 @@
       panel1.Controls.Add(gBoxLibraries);
       panel1.Location = new Point(19, 154);
       panel1.Name = "panel1";
-      panel1.Size = new Size(571, 63);
+      panel1.Size = new Size(951, 63);
       panel1.TabIndex = 15;
       // 
       // gBoxLibraries
       // 
-      gBoxLibraries.Controls.Add(radioButton1);
+      gBoxLibraries.Controls.Add(rBtnIText);
+      gBoxLibraries.Controls.Add(rBtnIronPDF);
       gBoxLibraries.Location = new Point(3, 3);
       gBoxLibraries.Name = "gBoxLibraries";
       gBoxLibraries.Size = new Size(582, 57);
@@ -338,33 +382,35 @@
       gBoxLibraries.TabStop = false;
       gBoxLibraries.Text = "Libraries";
       // 
-      // radioButton1
+      // rBtnIText
       // 
-      radioButton1.AutoSize = true;
-      radioButton1.Location = new Point(12, 25);
-      radioButton1.Name = "radioButton1";
-      radioButton1.Size = new Size(117, 24);
-      radioButton1.TabIndex = 0;
-      radioButton1.TabStop = true;
-      radioButton1.Text = "radioButton1";
-      radioButton1.UseVisualStyleBackColor = true;
+      rBtnIText.AutoSize = true;
+      rBtnIText.Enabled = false;
+      rBtnIText.Location = new Point(100, 25);
+      rBtnIText.Name = "rBtnIText";
+      rBtnIText.Size = new Size(61, 24);
+      rBtnIText.TabIndex = 1;
+      rBtnIText.Text = "IText";
+      rBtnIText.UseVisualStyleBackColor = true;
       // 
-      // cBoxEdit
+      // rBtnIronPDF
       // 
-      cBoxEdit.AutoSize = true;
-      cBoxEdit.Location = new Point(108, 56);
-      cBoxEdit.Name = "cBoxEdit";
-      cBoxEdit.Size = new Size(57, 24);
-      cBoxEdit.TabIndex = 11;
-      cBoxEdit.Text = "Edit";
-      cBoxEdit.UseVisualStyleBackColor = true;
+      rBtnIronPDF.AutoSize = true;
+      rBtnIronPDF.Checked = true;
+      rBtnIronPDF.Location = new Point(12, 25);
+      rBtnIronPDF.Name = "rBtnIronPDF";
+      rBtnIronPDF.Size = new Size(82, 24);
+      rBtnIronPDF.TabIndex = 0;
+      rBtnIronPDF.TabStop = true;
+      rBtnIronPDF.Text = "IronPDF";
+      rBtnIronPDF.UseVisualStyleBackColor = true;
       // 
       // MainForm
       // 
       AllowDrop = true;
       AutoScaleDimensions = new SizeF(8F, 20F);
       AutoScaleMode = AutoScaleMode.Font;
-      ClientSize = new Size(602, 609);
+      ClientSize = new Size(982, 609);
       Controls.Add(panel1);
       Controls.Add(splitContainer1);
       Controls.Add(lblDragAndDrop);
@@ -375,7 +421,7 @@
       Controls.Add(btnOutputPath);
       Controls.Add(btnFilePath);
       Controls.Add(txtFilePath);
-      MinimumSize = new Size(590, 500);
+      MinimumSize = new Size(1000, 500);
       Name = "MainForm";
       StartPosition = FormStartPosition.CenterScreen;
       Text = "PeeDeeEff Magic";
@@ -422,10 +468,13 @@
     private GroupBox groupBox1;
     private GroupBox groupBox2;
     private CheckBox cBoxExtractSignatures;
-    private CheckBox checkBox1;
+    private CheckBox cBoxShowRevisions;
     private Panel panel1;
     private GroupBox gBoxLibraries;
-    private RadioButton radioButton1;
+    private RadioButton rBtnIronPDF;
     private CheckBox cBoxEdit;
+    private CheckBox cBoxConvertHtml;
+    private RadioButton rBtnIText;
+    private CheckBox cBoxPreSave;
   }
 }

@@ -10,6 +10,10 @@ namespace PeeDeeEffMagic
     public MainForm()
     {
       InitializeComponent();
+
+      // Place at the top of your code, prior to running any other IronPdf methods
+      IronPdf.Logging.Logger.LogFilePath = "C:\\Clients\\Logs\\PeeDeeEffMagic.log";
+      IronPdf.Logging.Logger.LoggingMode = IronPdf.Logging.Logger.LoggingModes.All;
     }
 
     #region Form Variables
@@ -92,9 +96,32 @@ namespace PeeDeeEffMagic
         return;
       }
 
-      PdfDocument document = new PdfDocument(PdfFilePath: this.filePath, TrackChanges: ChangeTrackingModes.EnableChangeTracking);
-
       var mods = string.Empty;
+
+      if (cBoxPreSave.Checked)
+      {
+        PdfDocument preSavedDocument = new PdfDocument(PdfFilePath: this.filePath, TrackChanges: ChangeTrackingModes.EnableChangeTracking);
+        var preSaveOutputFilePath = Path.Combine(outputPath, $"{fileInfo.Name.Replace(".pdf", "")}_PreSaved.pdf");
+
+        this.filePath = preSaveOutputFilePath;
+
+        preSavedDocument = preSavedDocument.SaveAsRevision(preSaveOutputFilePath);
+        preSavedDocument.SaveAs(preSaveOutputFilePath, SaveAsRevision: false);
+        preSavedDocument.Dispose();
+
+        this.WriteToOutput($"File presaved before updates made.");
+
+        var preSavedFileInfo = new FileInfo(this.filePath);
+        if (!preSavedFileInfo.Exists)
+        {
+          MessageBox.Show("File does not exist.", "File Not Found");
+          this.WriteSectionBreak();
+          this.WriteToOutput("File does not exist. Ending process...");
+          return;
+        }
+      }
+
+      PdfDocument document = new PdfDocument(PdfFilePath: this.filePath, TrackChanges: ChangeTrackingModes.EnableChangeTracking);
 
       if (cBoxEdit.Checked)
       {
@@ -214,7 +241,7 @@ namespace PeeDeeEffMagic
 
       if (!string.IsNullOrWhiteSpace(mods))
       {
-        var outputFilePath = Path.Combine(outputPath, $"{fileInfo.Name.Replace("_CustomFlatIron", "").Replace(".pdf", "")}{mods}.pdf");
+        var outputFilePath = Path.Combine(outputPath, $"{fileInfo.Name.Replace(".pdf", "")}{mods}.pdf");
 
         var copyCount = 1;
 
@@ -228,7 +255,8 @@ namespace PeeDeeEffMagic
 
         if (cBoxRevise.Checked)
         {
-          outputFilePath = Path.Combine(outputPath, $"{fileInfo.Name.Replace("_CustomFlatIron", "").Replace(".pdf", "")}{mods}.pdf");
+          //var revisedDocument = document.SaveAsRevision(outputFilePath);
+          //document = new PdfDocument(PdfFilePath: outputFilePath, TrackChanges: ChangeTrackingModes.EnableChangeTracking);
           document = document.SaveAsRevision(outputFilePath);
 
           this.WriteToOutput($"File saved as revision. File is at version: {document}");
@@ -236,7 +264,6 @@ namespace PeeDeeEffMagic
 
         if (cBoxSign.Checked)
         {
-          outputFilePath = Path.Combine(outputPath, $"{fileInfo.Name.Replace("_CustomFlatIron", "").Replace(".pdf", "")}{mods}.pdf");
           document.SignWithFile($"C:\\Users\\DFouche\\Documents\\Personal Docs\\Coding Exercises and tings\\MySignature.pfx",
                                 "bZQBjzHlm77YfhxuF6M2",
                                 null,
@@ -258,10 +285,27 @@ namespace PeeDeeEffMagic
           }
         }
 
+        if (cBoxConvertHtml.Checked)
+        {
+          var htmlFormatOptions = new HtmlFormatOptions();
+          var documentHtmlString = document.ToHtmlString(fullContentWidth: true);
+          var renderer = new ChromePdfRenderer();
+          var htmlDocument = renderer.RenderHtmlAsPdf(documentHtmlString);
+
+          var htmlPdfOutputPath = Path.Combine(outputFilePath, $"{fileInfo.Name.Replace(".pdf", "")}ConvertedFromHtml.pdf");
+
+          this.WriteToOutput($"Saving html version of file to {outputFilePath}");
+
+          htmlDocument.SaveAs(htmlPdfOutputPath);
+          this.WriteToOutput("File saved.");
+        }
+
         this.WriteToOutput($"Saving file to {outputFilePath}");
 
-        document.SaveAs(outputFilePath);
+        document.SaveAs(outputFilePath, SaveAsRevision: false);
         this.WriteToOutput("File saved.");
+
+        document.Dispose();
       }
       else
       {

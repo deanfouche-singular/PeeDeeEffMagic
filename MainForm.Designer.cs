@@ -32,7 +32,7 @@
       btnProcess = new Button();
       cBoxFlatten = new CheckBox();
       cBoxRevise = new CheckBox();
-      cBoxCustomFlatten = new CheckBox();
+      cBoxReadonly = new CheckBox();
       cBoxReadFields = new CheckBox();
       btnFilePath = new Button();
       btnOutputPath = new Button();
@@ -105,8 +105,6 @@
       // cBoxRevise
       // 
       cBoxRevise.AutoSize = true;
-      cBoxRevise.Checked = true;
-      cBoxRevise.CheckState = CheckState.Checked;
       cBoxRevise.Location = new Point(12, 56);
       cBoxRevise.Name = "cBoxRevise";
       cBoxRevise.Size = new Size(73, 24);
@@ -114,17 +112,17 @@
       cBoxRevise.Text = "Revise";
       cBoxRevise.UseVisualStyleBackColor = true;
       // 
-      // cBoxCustomFlatten
+      // cBoxReadonly
       // 
-      cBoxCustomFlatten.AutoSize = true;
-      cBoxCustomFlatten.Checked = true;
-      cBoxCustomFlatten.CheckState = CheckState.Checked;
-      cBoxCustomFlatten.Location = new Point(246, 26);
-      cBoxCustomFlatten.Name = "cBoxCustomFlatten";
-      cBoxCustomFlatten.Size = new Size(93, 24);
-      cBoxCustomFlatten.TabIndex = 4;
-      cBoxCustomFlatten.Text = "Readonly";
-      cBoxCustomFlatten.UseVisualStyleBackColor = true;
+      cBoxReadonly.AutoSize = true;
+      cBoxReadonly.Checked = true;
+      cBoxReadonly.CheckState = CheckState.Checked;
+      cBoxReadonly.Location = new Point(246, 26);
+      cBoxReadonly.Name = "cBoxReadonly";
+      cBoxReadonly.Size = new Size(93, 24);
+      cBoxReadonly.TabIndex = 4;
+      cBoxReadonly.Text = "Readonly";
+      cBoxReadonly.UseVisualStyleBackColor = true;
       // 
       // cBoxReadFields
       // 
@@ -238,7 +236,7 @@
       groupBox1.Controls.Add(cBoxExtractSignatures);
       groupBox1.Controls.Add(cBoxFlattenPartial);
       groupBox1.Controls.Add(cBoxSign);
-      groupBox1.Controls.Add(cBoxCustomFlatten);
+      groupBox1.Controls.Add(cBoxReadonly);
       groupBox1.Controls.Add(cBoxFlatten);
       groupBox1.Controls.Add(cBoxRevise);
       groupBox1.Location = new Point(3, 3);
@@ -458,7 +456,7 @@
     private RichTextBox rTxtOutputDialog;
     private CheckBox cBoxReadFields;
     private Label lblDragAndDrop;
-    private CheckBox cBoxCustomFlatten;
+    private CheckBox cBoxReadonly;
     private CheckBox cBoxRevise;
     private SplitContainer splitContainer1;
     private SplitContainer splitContainer2;

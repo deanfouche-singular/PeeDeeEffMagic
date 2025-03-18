@@ -1,5 +1,6 @@
 namespace PeeDeeEffMagic
 {
+  using System.Text;
   using IronPdf.Rendering;
   using IronPdf.Signing;
   using IronSoftware.Pdfium;
@@ -149,16 +150,32 @@ namespace PeeDeeEffMagic
         foreach (var fieldName in fieldsToEdit)
         {
           var fieldToEdit = document.Form.FindFormField(fieldName);
-          if (fieldToEdit != null && fieldToEdit.Type == PdfFormFieldType.Textfield)
+          if (fieldToEdit != null)
           {
-            using (TextInputForm textInput = new TextInputForm(fieldName, fieldToEdit.Value))
+            if (fieldToEdit.Type == PdfFormFieldType.Textfield)
             {
-              if (textInput.ShowDialog() == DialogResult.OK)
+              using (TextInputForm textInput = new TextInputForm(fieldName, fieldToEdit.Value))
               {
-                var fieldValue = textInput.FieldValue;
-                this.WriteToOutput($"Field: {fieldName} - Value: {fieldValue}");
-                var field = document.Form.FindFormField(fieldName);
-                field.Value = fieldValue;
+                if (textInput.ShowDialog() == DialogResult.OK)
+                {
+                  var fieldValue = textInput.FieldValue;
+                  this.WriteToOutput($"Field: {fieldName} - Value: {fieldValue}");
+                  var field = document.Form.FindFormField(fieldName);
+                  field.Value = fieldValue;
+                }
+              }
+            }
+            else if (fieldToEdit.Type == PdfFormFieldType.Checkbox)
+            {
+              using (CheckBoxInputForm checkBoxInput = new CheckBoxInputForm(fieldName, fieldToEdit.Value))
+              {
+                if (checkBoxInput.ShowDialog() == DialogResult.OK)
+                {
+                  //var fieldValue = checkBoxInput.FieldValue;
+                  //this.WriteToOutput($"Field: {fieldName} - Value: {fieldValue}");
+                  //var field = document.Form.FindFormField(fieldName);
+                  //field.Value = fieldValue;
+                }
               }
             }
           }
@@ -202,7 +219,7 @@ namespace PeeDeeEffMagic
         this.WriteFieldsToOutput(document);
       }
 
-      if (cBoxCustomFlatten.Checked)
+      if (cBoxReadonly.Checked)
       {
         this.WriteSectionBreak();
         this.WriteToOutput("Custom flattening form fields...");
@@ -216,16 +233,16 @@ namespace PeeDeeEffMagic
 
         string[] fieldsToFlatten = [];
 
-        using (FieldSelectorForm fieldSelector = new FieldSelectorForm("Set as readonly", allFieldNames.ToArray())) // Ensure proper disposal
+        using (FieldSelectorForm fieldSelector = new FieldSelectorForm("Set as readonly", allFieldNames.ToArray()))
         {
-          if (fieldSelector.ShowDialog() == DialogResult.OK) // Blocks execution until Form2 is closed
+          if (fieldSelector.ShowDialog() == DialogResult.OK)
           {
-            fieldsToFlatten = fieldSelector.SelectedFields; // Retrieve input from Form2
-            this.WriteToOutput($"Fields selected for flattening: {string.Join(", ", fieldsToFlatten)}");
+            fieldsToFlatten = fieldSelector.SelectedFields;
+            this.WriteToOutput($"Fields selected for readonly: {string.Join(", ", fieldsToFlatten)}");
           }
         }
 
-        this.FlattenFields(document, fieldsToFlatten);
+        this.SetFieldsToReadonly(document, fieldsToFlatten);
         mods = $"{mods}_CustomFlatIron";
       }
 
@@ -255,8 +272,6 @@ namespace PeeDeeEffMagic
 
         if (cBoxRevise.Checked)
         {
-          //var revisedDocument = document.SaveAsRevision(outputFilePath);
-          //document = new PdfDocument(PdfFilePath: outputFilePath, TrackChanges: ChangeTrackingModes.EnableChangeTracking);
           document = document.SaveAsRevision(outputFilePath);
 
           this.WriteToOutput($"File saved as revision. File is at version: {document}");
@@ -365,14 +380,12 @@ namespace PeeDeeEffMagic
 
     #region Custom Methods
 
-    private void FlattenFields(PdfDocument document, string[] fieldNames)
+    private void SetFieldsToReadonly(PdfDocument document, string[] fieldNames)
     {
-      var form = document.Form;
-      //var font = document.Fonts.FirstOrDefault(font => font.Name.Contains("Arial") && font.Name.Contains("Bold") && font.Name.Contains("Italic"));
       var font = document.Fonts.FirstOrDefault(font => font.Name.Contains("Arial") && font.Name.Contains("Bold") && font.Name.Contains("Italic"));
       var fontSize = font != null ? font.FontSize : 12;
 
-      if (form.Count > 0)
+      if (document.Form.Count > 0)
       {
         if (cBoxReadFields.Checked)
         {
@@ -380,21 +393,49 @@ namespace PeeDeeEffMagic
           this.WriteToOutput("Reading form fields...");
         }
 
-        foreach (var field in form)
+        foreach (var field in document.Form)
         {
-          if (cBoxCustomFlatten.Checked && field.Type == PdfFormFieldType.Textfield && !field.ReadOnly && Array.Exists(fieldNames, f => f == field.Name))
+          if (cBoxReadonly.Checked && field.Type == PdfFormFieldType.Textfield && !field.ReadOnly && Array.Exists(fieldNames, f => f == field.Name))
           {
-            // Get the field's value
-            //string fieldValue = field.Value;
-            //string utf8Value = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(fieldValue));
-            //field.Value = string.Empty;
-
-            // Remove the field and replace it with static text
             field.ReadOnly = true;
             this.WriteToOutput($"Flattening field: {field.Name} with value: {field.Value}.");
+          }
+        }
+      }
+      else
+      {
+        this.WriteToOutput("No form fields found.");
+      }
+    }
+
+    private void ReplaceFieldsWithDrawnText(PdfDocument document, string[] fieldNames)
+    {
+      var font = document.Fonts.FirstOrDefault(font => font.Name.Contains("Arial") && font.Name.Contains("Bold") && font.Name.Contains("Italic"));
+      var fontSize = font != null ? font.FontSize : 12;
+
+      if (document.Form.Count > 0)
+      {
+        if (cBoxReadFields.Checked)
+        {
+          this.WriteSectionBreak();
+          this.WriteToOutput("Reading form fields...");
+        }
+
+        foreach (var fieldName in fieldNames)
+        {
+          var field = document.Form.FindFormField(fieldName);
+
+          if (field != null)
+          {
+            // Get the field's value
+            string fieldValue = field.Value;
+            string utf8Value = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(fieldValue));
 
             // Create a text annotation at the same position (as a workaround)
-            //document.DrawText(fieldValue, font, FontSize: fontSize, PageIndex: (int)field.PageIndex, X: field.X, Y: field.Y, Color: Color.Black, Rotation: 0.0);
+            document.DrawText(fieldValue, font, FontSize: fontSize, PageIndex: (int)field.PageIndex, X: field.X, Y: field.Y, Color: Color.Black, Rotation: 0.0);
+            document.Form.Remove(field);
+
+            this.WriteToOutput($"Replacing field: {field.Name} with drawn text value: {field.Value}.");
           }
         }
       }

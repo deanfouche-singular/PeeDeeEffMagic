@@ -60,6 +60,7 @@
       txtBoxFieldValue.Name = "txtBoxFieldValue";
       txtBoxFieldValue.Size = new Size(258, 27);
       txtBoxFieldValue.TabIndex = 2;
+      txtBoxFieldValue.KeyDown += txtBoxFieldValue_KeyDown;
       txtBoxFieldValue.MouseLeave += txtBoxFieldValue_MouseLeave;
       txtBoxFieldValue.MouseHover += txtBoxFieldValue_MouseHover;
       // 

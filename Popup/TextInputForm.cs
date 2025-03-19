@@ -32,5 +32,13 @@
       this.DialogResult = DialogResult.OK;
       this.Close();
     }
+
+    private void txtBoxFieldValue_KeyDown(object sender, KeyEventArgs e)
+    {
+      if (e.KeyCode == Keys.Enter)
+      {
+        this.btnOK_Click(sender, e);
+      }
+    }
   }
 }

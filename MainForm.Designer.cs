@@ -57,6 +57,7 @@
       gBoxLibraries = new GroupBox();
       rBtnIText = new RadioButton();
       rBtnIronPDF = new RadioButton();
+      cBoxAddField = new CheckBox();
       ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
       splitContainer1.Panel1.SuspendLayout();
       splitContainer1.Panel2.SuspendLayout();
@@ -230,6 +231,7 @@
       // groupBox1
       // 
       groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+      groupBox1.Controls.Add(cBoxAddField);
       groupBox1.Controls.Add(cBoxPreSave);
       groupBox1.Controls.Add(cBoxEdit);
       groupBox1.Controls.Add(cBoxShowRevisions);
@@ -403,6 +405,16 @@
       rBtnIronPDF.Text = "IronPDF";
       rBtnIronPDF.UseVisualStyleBackColor = true;
       // 
+      // cBoxAddField
+      // 
+      cBoxAddField.AutoSize = true;
+      cBoxAddField.Location = new Point(246, 56);
+      cBoxAddField.Name = "cBoxAddField";
+      cBoxAddField.Size = new Size(95, 24);
+      cBoxAddField.TabIndex = 13;
+      cBoxAddField.Text = "Add Field";
+      cBoxAddField.UseVisualStyleBackColor = true;
+      // 
       // MainForm
       // 
       AllowDrop = true;
@@ -474,5 +486,6 @@
     private CheckBox cBoxConvertHtml;
     private RadioButton rBtnIText;
     private CheckBox cBoxPreSave;
+    private CheckBox cBoxAddField;
   }
 }

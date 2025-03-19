@@ -171,10 +171,10 @@ namespace PeeDeeEffMagic
               {
                 if (checkBoxInput.ShowDialog() == DialogResult.OK)
                 {
-                  //var fieldValue = checkBoxInput.FieldValue;
-                  //this.WriteToOutput($"Field: {fieldName} - Value: {fieldValue}");
-                  //var field = document.Form.FindFormField(fieldName);
-                  //field.Value = fieldValue;
+                  var fieldValue = checkBoxInput.FieldValue;
+                  this.WriteToOutput($"Field: {fieldName} - Value: {fieldValue}");
+                  var field = document.Form.FindFormField(fieldName);
+                  field.Value = fieldValue;
                 }
               }
             }
@@ -395,10 +395,17 @@ namespace PeeDeeEffMagic
 
         foreach (var field in document.Form)
         {
-          if (cBoxReadonly.Checked && field.Type == PdfFormFieldType.Textfield && !field.ReadOnly && Array.Exists(fieldNames, f => f == field.Name))
+          if (cBoxReadonly.Checked && Array.Exists(fieldNames, f => f == field.Name))
           {
-            field.ReadOnly = true;
-            this.WriteToOutput($"Flattening field: {field.Name} with value: {field.Value}.");
+            if (field.ReadOnly)
+            {
+              this.WriteToOutput($"Field: {field.Name} with value: {field.Value} is already set to readonly.");
+            }
+            else
+            {
+              field.ReadOnly = true;
+              this.WriteToOutput($"Field: {field.Name} with value: {field.Value} has now been set to readonly.");
+            }
           }
         }
       }

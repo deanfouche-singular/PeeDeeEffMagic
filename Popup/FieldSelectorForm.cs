@@ -14,6 +14,8 @@
     public string[] ExistingFields { get; private set; }
     public string[] SelectedFields { get; private set; }
 
+    #region Button event handlers
+
     private void btnContinue_Click(object sender, EventArgs e)
     {
       this.SelectedFields = new string[lBoxSelectedFields.Items.Count];
@@ -61,5 +63,7 @@
         }
       }
     }
+
+    #endregion
   }
 }

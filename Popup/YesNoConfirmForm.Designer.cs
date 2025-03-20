@@ -42,6 +42,7 @@
       btnOK.TabIndex = 0;
       btnOK.Text = "Yes";
       btnOK.UseVisualStyleBackColor = true;
+      btnOK.Click += btnOK_Click;
       // 
       // btnCancel
       // 
@@ -52,6 +53,7 @@
       btnCancel.TabIndex = 1;
       btnCancel.Text = "Cancel";
       btnCancel.UseVisualStyleBackColor = true;
+      btnCancel.Click += btnCancel_Click;
       // 
       // lblDescription
       // 
@@ -70,9 +72,10 @@
       Controls.Add(lblDescription);
       Controls.Add(btnCancel);
       Controls.Add(btnOK);
+      FormBorderStyle = FormBorderStyle.FixedToolWindow;
       MinimumSize = new Size(290, 130);
       Name = "YesNoConfirmForm";
-      Text = "YesNoConfirmForm";
+      Text = "YesNoConfirm";
       ResumeLayout(false);
       PerformLayout();
     }

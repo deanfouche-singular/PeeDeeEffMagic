@@ -76,6 +76,7 @@
       Controls.Add(txtBoxFieldValue);
       Controls.Add(btnOK);
       Controls.Add(lblFieldName);
+      FormBorderStyle = FormBorderStyle.FixedToolWindow;
       MaximumSize = new Size(300, 155);
       MinimumSize = new Size(300, 155);
       Name = "TextInputForm";

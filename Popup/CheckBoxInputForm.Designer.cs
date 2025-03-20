@@ -69,6 +69,7 @@
       Controls.Add(btnOK);
       Controls.Add(cBoxFieldValue);
       Controls.Add(lblFieldName);
+      FormBorderStyle = FormBorderStyle.FixedToolWindow;
       MaximumSize = new Size(300, 155);
       Name = "CheckBoxInputForm";
       StartPosition = FormStartPosition.CenterParent;

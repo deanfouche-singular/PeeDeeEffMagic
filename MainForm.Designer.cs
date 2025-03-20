@@ -43,6 +43,7 @@
       lblDragAndDrop = new Label();
       splitContainer1 = new SplitContainer();
       groupBox1 = new GroupBox();
+      cBoxAddField = new CheckBox();
       cBoxPreSave = new CheckBox();
       cBoxEdit = new CheckBox();
       cBoxShowRevisions = new CheckBox();
@@ -51,13 +52,13 @@
       cBoxSign = new CheckBox();
       splitContainer2 = new SplitContainer();
       groupBox2 = new GroupBox();
+      cBoxExportUnique = new CheckBox();
       cBoxConvertHtml = new CheckBox();
       cBoxExportFieldsCsv = new CheckBox();
       panel1 = new Panel();
       gBoxLibraries = new GroupBox();
       rBtnIText = new RadioButton();
       rBtnIronPDF = new RadioButton();
-      cBoxAddField = new CheckBox();
       ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
       splitContainer1.Panel1.SuspendLayout();
       splitContainer1.Panel2.SuspendLayout();
@@ -248,6 +249,16 @@
       groupBox1.TabStop = false;
       groupBox1.Text = "Modifications";
       // 
+      // cBoxAddField
+      // 
+      cBoxAddField.AutoSize = true;
+      cBoxAddField.Location = new Point(246, 56);
+      cBoxAddField.Name = "cBoxAddField";
+      cBoxAddField.Size = new Size(95, 24);
+      cBoxAddField.TabIndex = 13;
+      cBoxAddField.Text = "Add Field";
+      cBoxAddField.UseVisualStyleBackColor = true;
+      // 
       // cBoxPreSave
       // 
       cBoxPreSave.AutoSize = true;
@@ -332,6 +343,7 @@
       // groupBox2
       // 
       groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+      groupBox2.Controls.Add(cBoxExportUnique);
       groupBox2.Controls.Add(cBoxConvertHtml);
       groupBox2.Controls.Add(cBoxExportFieldsCsv);
       groupBox2.Controls.Add(cBoxReadFields);
@@ -342,10 +354,21 @@
       groupBox2.TabStop = false;
       groupBox2.Text = "Output Options";
       // 
+      // cBoxExportUnique
+      // 
+      cBoxExportUnique.AutoSize = true;
+      cBoxExportUnique.Enabled = false;
+      cBoxExportUnique.Location = new Point(6, 86);
+      cBoxExportUnique.Name = "cBoxExportUnique";
+      cBoxExportUnique.Size = new Size(208, 24);
+      cBoxExportUnique.TabIndex = 7;
+      cBoxExportUnique.Text = "Export Unique Fields (json)";
+      cBoxExportUnique.UseVisualStyleBackColor = true;
+      // 
       // cBoxConvertHtml
       // 
       cBoxConvertHtml.AutoSize = true;
-      cBoxConvertHtml.Location = new Point(6, 86);
+      cBoxConvertHtml.Location = new Point(6, 113);
       cBoxConvertHtml.Name = "cBoxConvertHtml";
       cBoxConvertHtml.Size = new Size(141, 24);
       cBoxConvertHtml.TabIndex = 6;
@@ -404,16 +427,6 @@
       rBtnIronPDF.TabStop = true;
       rBtnIronPDF.Text = "IronPDF";
       rBtnIronPDF.UseVisualStyleBackColor = true;
-      // 
-      // cBoxAddField
-      // 
-      cBoxAddField.AutoSize = true;
-      cBoxAddField.Location = new Point(246, 56);
-      cBoxAddField.Name = "cBoxAddField";
-      cBoxAddField.Size = new Size(95, 24);
-      cBoxAddField.TabIndex = 13;
-      cBoxAddField.Text = "Add Field";
-      cBoxAddField.UseVisualStyleBackColor = true;
       // 
       // MainForm
       // 
@@ -487,5 +500,6 @@
     private RadioButton rBtnIText;
     private CheckBox cBoxPreSave;
     private CheckBox cBoxAddField;
+    private CheckBox cBoxExportUnique;
   }
 }

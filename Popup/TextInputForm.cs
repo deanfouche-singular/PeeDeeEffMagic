@@ -10,7 +10,7 @@
       this.Text = $"Edit field: {fieldName}";
       this.lblFieldName.Text = fieldName;
       this.txtBoxFieldValue.Text = fieldValue;
-      this.tTipFieldValue.SetToolTip(this.txtBoxFieldValue, this.txtBoxFieldValue.Text); ;
+      this.tTipFieldValue.SetToolTip(this.txtBoxFieldValue, this.txtBoxFieldValue.Text);
       this.ActiveControl = this.txtBoxFieldValue;
     }
 
@@ -18,6 +18,7 @@
 
     private void txtBoxFieldValue_MouseHover(object sender, EventArgs e)
     {
+      this.tTipFieldValue.SetToolTip(this.txtBoxFieldValue, this.txtBoxFieldValue.Text);
       this.tTipFieldValue.Active = true;
     }
 

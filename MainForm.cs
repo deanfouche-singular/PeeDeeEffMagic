@@ -3,7 +3,9 @@ namespace PeeDeeEffMagic
   using System.Text;
   using IronPdf.Rendering;
   using IronPdf.Signing;
+  using IronSoftware.Forms;
   using IronSoftware.Pdfium;
+  using Newtonsoft.Json;
   using PeeDeeEffMagic.Popup;
 
   public partial class MainForm : Form
@@ -53,6 +55,7 @@ namespace PeeDeeEffMagic
     #region Form Controls
 
     #region Button Click Events
+
     private void btnFilePath_Click(object sender, EventArgs e)
     {
       OpenFileDialog dialog = new OpenFileDialog();
@@ -78,6 +81,11 @@ namespace PeeDeeEffMagic
       }
     }
 
+    /// <summary>
+    /// The main process button click event.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void btnProcess_Click(object sender, EventArgs e)
     {
       if (string.IsNullOrEmpty(this.filePath) || string.IsNullOrEmpty(this.outputPath))
@@ -123,6 +131,48 @@ namespace PeeDeeEffMagic
       }
 
       PdfDocument document = new PdfDocument(PdfFilePath: this.filePath, TrackChanges: ChangeTrackingModes.EnableChangeTracking);
+
+      if (cBoxAddField.Checked)
+      {
+        var fieldsAdded = false;
+
+        using (AddNewFieldForm addFieldForm = new AddNewFieldForm(document.PageCount))
+        {
+          if (addFieldForm.ShowDialog() == DialogResult.OK)
+          {
+            var fieldName = addFieldForm.FieldName;
+            var fieldValue = "Yes"; // addFieldForm.FieldValue;
+            var fieldType = addFieldForm.FieldType;
+            var pageIndex = addFieldForm.PageIndex;
+            var fieldPos = addFieldForm.FieldPos;
+            var height = addFieldForm.FieldHeight;
+            var width = addFieldForm.FieldWidth;
+
+            if (fieldType == "Text")
+            {
+              var textField = new TextFormField(fieldName, fieldValue, pageIndex, fieldPos.Item1, fieldPos.Item2, width, height);
+              document.Form.Add(textField);
+            }
+            else if (fieldType == "CheckBox")
+            {
+              var checkboxField = new CheckboxFormField(fieldName, fieldValue == "Yes" ? fieldValue : "Off", pageIndex, fieldPos.Item1, fieldPos.Item2, width, height);
+              document.Form.Add(checkboxField);
+            }
+            else if (fieldType == "Signature")
+            {
+              var signatureField = new SignatureFormField(fieldName, pageIndex, fieldPos.Item1, fieldPos.Item2, width, height);
+              document.Form.Add(signatureField);
+            }
+
+            fieldsAdded = true;
+          }
+        }
+
+        if (fieldsAdded)
+        {
+          mods = $"{mods}_CustomFieldIron";
+        }
+      }
 
       if (cBoxEdit.Checked)
       {
@@ -210,6 +260,13 @@ namespace PeeDeeEffMagic
         this.WriteSectionBreak();
         this.WriteToOutput("Exporting form fields to CSV...");
         this.ExportToCsv(document);
+      }
+
+      if (cBoxExportUnique.Checked)
+      {
+        this.WriteSectionBreak();
+        this.WriteToOutput("Exporting unique form fields to JSON...");
+        this.ExportUniqueToJson(document);
       }
 
       if (cBoxReadFields.Checked)
@@ -485,6 +542,30 @@ namespace PeeDeeEffMagic
         var csvPath = Path.Combine(this.outputPath, $"{Path.GetFileNameWithoutExtension(this.filePath)}_fields.csv");
 
         File.WriteAllText(csvPath, csv);
+      }
+    }
+
+    private void ExportUniqueToJson(PdfDocument document)
+    {
+      var form = document.Form;
+      var fieldTypes = new List<PdfFormFieldType>();
+      var json = $"{{\"UniqueFields\": [";
+      if (form.Count > 0)
+      {
+        foreach (var field in form)
+        {
+          if (!fieldTypes.Contains(field.Type))
+          {
+            fieldTypes.Add(field.Type);
+            json += $"{JsonConvert.SerializeObject(field)},";
+          }
+        }
+
+        json += $"]}}";
+
+        var jsonPath = Path.Combine(this.outputPath, $"{Path.GetFileNameWithoutExtension(this.filePath)}_uniqueFields.json");
+
+        File.WriteAllText(jsonPath, json);
       }
     }
 

@@ -4,11 +4,18 @@
 
   public partial class AddNewFieldForm : Form
   {
-    public AddNewFieldForm(int pages)
+    public AddNewFieldForm(int pages, double? txtHeight = null, double? txtWidth = null, double? cBoxHeight = null, double? cBoxWidth = null, bool alreadySigned = false)
     {
       InitializeComponent();
       this.SetFieldType("Text");
       this.PopulatePageNos(pages);
+
+      this.DefaultTextWidth = txtWidth ?? 100;
+      this.DefaultTextHeight = txtHeight ?? 14.5;
+      this.DefaultCheckboxWidth = cBoxWidth ?? 10;
+      this.DefaultCheckboxHeight = cBoxHeight ?? 10;
+
+      this.rBtnSignature.Enabled = !alreadySigned;
     }
 
     public string FieldName { get; private set; }
@@ -22,6 +29,14 @@
     public double FieldWidth { get; private set; }
 
     public double FieldHeight { get; private set; }
+
+    private double DefaultTextWidth { get; set; }
+
+    private double DefaultTextHeight { get; set; }
+
+    private double DefaultCheckboxWidth { get; set; }
+
+    private double DefaultCheckboxHeight { get; set; }
 
     #region Modifiers
 
@@ -47,8 +62,8 @@
       if (rBtnText.Checked)
       {
         SetFieldType("Text");
-        this.txtWidth.Text = "100";
-        this.txtHeight.Text = "14.5";
+        this.txtWidth.Text = $"{this.DefaultTextWidth}";
+        this.txtHeight.Text = $"{this.DefaultTextHeight}";
       }
     }
 
@@ -57,8 +72,8 @@
       if (rBtnCheckBox.Checked)
       {
         SetFieldType("CheckBox");
-        this.txtWidth.Text = "10";
-        this.txtHeight.Text = "10";
+        this.txtWidth.Text = $"{this.DefaultCheckboxWidth}";
+        this.txtHeight.Text = $"{this.DefaultCheckboxHeight}";
       }
     }
 
@@ -67,8 +82,8 @@
       if (rBtnSignature.Checked)
       {
         SetFieldType("Signature");
-        this.txtWidth.Text = "100";
-        this.txtHeight.Text = "14.5";
+        this.txtWidth.Text = $"{this.DefaultTextWidth}";
+        this.txtHeight.Text = $"{this.DefaultTextHeight}";
       }
     }
 
@@ -103,6 +118,12 @@
     private void btnAdd_Click(object sender, EventArgs e)
     {
       this.FieldName = txtFieldName.Text;
+
+      if (cboBoxPages.SelectedItem != null && uint.TryParse(cboBoxPages.SelectedItem.ToString(), out uint page))
+      {
+        this.PageIndex = page - 1;
+      }
+
       if (double.TryParse(txtWidth.Text, out double width) && double.TryParse(txtHeight.Text, out double height))
       {
         this.FieldWidth = width;

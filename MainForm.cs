@@ -611,7 +611,7 @@ namespace PeeDeeEffMagic
       {
         foreach (var field in form)
         {
-          csv += $"{field.Name},{(string.IsNullOrWhiteSpace(field.Value) ? "Empty Value" : field.Value)},{field.Type},{field.ReadOnly},{field.PageIndex + 1},\"X-{field.X}\",\"Y-{field.Y}\"{Environment.NewLine}";
+          csv += $"\"{field.Name}\",{(string.IsNullOrWhiteSpace(field.Value) ? "Empty Value" : $"\"{field.Value}\"")},{field.Type},{field.ReadOnly},{field.PageIndex + 1},\"X-{field.X}\",\"Y-{field.Y}\"{Environment.NewLine}";
         }
 
         var csvPath = Path.Combine(this.outputPath, $"{Path.GetFileNameWithoutExtension(this.filePath)}_fields.csv");

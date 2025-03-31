@@ -75,6 +75,7 @@
       FormBorderStyle = FormBorderStyle.FixedToolWindow;
       MinimumSize = new Size(290, 130);
       Name = "YesNoConfirmForm";
+      StartPosition = FormStartPosition.CenterParent;
       Text = "YesNoConfirm";
       ResumeLayout(false);
       PerformLayout();

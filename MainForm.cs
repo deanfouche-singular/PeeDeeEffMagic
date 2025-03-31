@@ -15,14 +15,15 @@ namespace PeeDeeEffMagic
       InitializeComponent();
 
       // Place at the top of your code, prior to running any other IronPdf methods
-      IronPdf.Logging.Logger.LogFilePath = "C:\\Clients\\Logs\\PeeDeeEffMagic.log";
-      IronPdf.Logging.Logger.LoggingMode = IronPdf.Logging.Logger.LoggingModes.All;
+      //IronPdf.Logging.Logger.LogFilePath = "C:\\Clients\\Logs\\PeeDeeEffMagic.log";
+      //IronPdf.Logging.Logger.LoggingMode = IronPdf.Logging.Logger.LoggingModes.All;
     }
 
     #region Form Variables
 
     private string filePath;
     private string outputPath;
+    private PdfSignature? signature;
 
     #endregion
 
@@ -88,6 +89,8 @@ namespace PeeDeeEffMagic
     /// <param name="e"></param>
     private void btnProcess_Click(object sender, EventArgs e)
     {
+      this.filePath = txtFilePath.Text;
+
       if (string.IsNullOrEmpty(this.filePath) || string.IsNullOrEmpty(this.outputPath))
       {
         MessageBox.Show("Please select a file and output path.", "Invalid File/Output Path");
@@ -135,36 +138,79 @@ namespace PeeDeeEffMagic
       if (cBoxAddField.Checked)
       {
         var fieldsAdded = false;
+        var signatureAdded = false;
+        var existingCheckbox = document.Form.FirstOrDefault(formField => formField.Type == PdfFormFieldType.Checkbox);
+        double? cBoxHeight = existingCheckbox != null ? existingCheckbox.Height : null;
+        double? cBoxWidth = existingCheckbox != null ? existingCheckbox.Width : null;
 
-        using (AddNewFieldForm addFieldForm = new AddNewFieldForm(document.PageCount))
+        var addMoreFields = true;
+
+        while (addMoreFields)
         {
-          if (addFieldForm.ShowDialog() == DialogResult.OK)
+          using (AddNewFieldForm addFieldForm = new AddNewFieldForm(document.PageCount,
+                                                                    cBoxHeight: cBoxHeight,
+                                                                    cBoxWidth: cBoxWidth,
+                                                                    alreadySigned: signatureAdded))
           {
-            var fieldName = addFieldForm.FieldName;
-            var fieldValue = "Yes"; // addFieldForm.FieldValue;
-            var fieldType = addFieldForm.FieldType;
-            var pageIndex = addFieldForm.PageIndex;
-            var fieldPos = addFieldForm.FieldPos;
-            var height = addFieldForm.FieldHeight;
-            var width = addFieldForm.FieldWidth;
+            if (addFieldForm.ShowDialog() == DialogResult.OK)
+            {
+              var fieldName = addFieldForm.FieldName;
+              var fieldValue = "Yes"; // addFieldForm.FieldValue;
+              var fieldType = addFieldForm.FieldType;
+              var pageIndex = addFieldForm.PageIndex;
+              var fieldPos = addFieldForm.FieldPos;
+              var height = addFieldForm.FieldHeight;
+              var width = addFieldForm.FieldWidth;
 
-            if (fieldType == "Text")
-            {
-              var textField = new TextFormField(fieldName, fieldValue, pageIndex, fieldPos.Item1, fieldPos.Item2, width, height);
-              document.Form.Add(textField);
-            }
-            else if (fieldType == "CheckBox")
-            {
-              var checkboxField = new CheckboxFormField(fieldName, fieldValue == "Yes" ? fieldValue : "Off", pageIndex, fieldPos.Item1, fieldPos.Item2, width, height);
-              document.Form.Add(checkboxField);
-            }
-            else if (fieldType == "Signature")
-            {
-              var signatureField = new SignatureFormField(fieldName, pageIndex, fieldPos.Item1, fieldPos.Item2, width, height);
-              document.Form.Add(signatureField);
-            }
+              if (fieldType == "Text")
+              {
+                var textField = new TextFormField(fieldName, fieldValue, pageIndex, fieldPos.Item1, fieldPos.Item2, width, height);
+                document.Form.Add(textField);
+              }
+              else if (fieldType == "CheckBox")
+              {
+                var checkboxField = new CheckboxFormField(fieldName, fieldValue == "Yes" ? fieldValue : "Off", pageIndex, fieldPos.Item1, fieldPos.Item2, width, height);
 
-            fieldsAdded = true;
+                checkboxField.DefaultAppearance = existingCheckbox != null ? existingCheckbox.DefaultAppearance : "";
+                document.Form.Add(checkboxField);
+              }
+              else if (fieldType == "Signature")
+              {
+                signatureAdded = true;
+                cBoxSign.Checked = true;
+
+                this.signature = new PdfSignature($"C:\\Users\\DFouche\\Documents\\Personal Docs\\Coding Exercises and tings\\MySignature.pfx",
+                                           "bZQBjzHlm77YfhxuF6M2");
+
+                // Add granular information
+                this.signature.SignatureDate = DateTime.Now;
+                this.signature.SigningContact = "Dean Fouche";
+                this.signature.SigningLocation = "Johannesburg";
+                this.signature.SigningReason = "Liberty Demo";
+                this.signature.TimestampHashAlgorithm = TimestampHashAlgorithms.SHA256;
+                this.signature.TimeStampUrl = "http://timestamp.digicert.com";
+                this.signature.SignatureImage = new PdfSignatureImage($"C:\\Users\\DFouche\\Documents\\Personal Docs\\Coding Exercises and tings\\Signature.png",
+                                                                 (int)pageIndex,
+                                                                 new Rectangle((int)fieldPos.Item1, (int)fieldPos.Item2, 100, 60));
+
+                //var signatureField = new SignatureFormField(fieldName, pageIndex, fieldPos.Item1, fieldPos.Item2, width, height);
+                //document.Form.Add(signatureField);
+              }
+
+              fieldsAdded = true;
+            }
+          }
+
+          using (YesNoConfirmForm confirmForm = new YesNoConfirmForm("Add More Fields", "Do you want to add more fields?", "Yes", "No"))
+          {
+            if (confirmForm.ShowDialog() == DialogResult.OK)
+            {
+              addMoreFields = true;
+            }
+            else
+            {
+              addMoreFields = false;
+            }
           }
         }
 
@@ -228,6 +274,20 @@ namespace PeeDeeEffMagic
                 }
               }
             }
+            //else if (fieldToEdit.Type == PdfFormFieldType.Signature)
+            //{
+            //  using (CheckBoxInputForm checkBoxInput = new CheckBoxInputForm(fieldName, "Off"))
+            //  {
+            //    if (checkBoxInput.ShowDialog() == DialogResult.OK)
+            //    {
+            //      var fieldValue = checkBoxInput.FieldValue;
+            //      this.WriteToOutput($"Field: {fieldName} - Sign (Y/N): {(fieldValue == "Yes" ? fieldValue : "No")}");
+            //      cBoxSign.Checked = fieldValue == "Yes";
+            //      //var field = document.Form.FindFormField(fieldName);
+            //      //field.Value = fieldValue;
+            //    }
+            //  }
+            //}
           }
         }
 
@@ -260,13 +320,6 @@ namespace PeeDeeEffMagic
         this.WriteSectionBreak();
         this.WriteToOutput("Exporting form fields to CSV...");
         this.ExportToCsv(document);
-      }
-
-      if (cBoxExportUnique.Checked)
-      {
-        this.WriteSectionBreak();
-        this.WriteToOutput("Exporting unique form fields to JSON...");
-        this.ExportUniqueToJson(document);
       }
 
       if (cBoxReadFields.Checked)
@@ -313,6 +366,23 @@ namespace PeeDeeEffMagic
         mods = $"{mods}_Signed";
       }
 
+      if (cBoxExtractSignatures.Checked)
+      {
+        var signatures = document.GetVerifiedSignatures();
+        var revisedSignatures = document.GetVerifiedSignatures();
+
+        if (signatures != null && signatures.Count > 0)
+        {
+          this.WriteToOutput("Signatures found in document: ");
+          foreach (var signature in signatures)
+          {
+            this.WriteToOutput($"Signature: {signature.SignatureName} - {signature.SigningContact} - {signature.SigningDate}");
+            this.WriteToOutput($"Location: {signature.SigningLocation}");
+            this.WriteToOutput($"Reason: {signature.SigningReason}");
+          }
+        }
+      }
+
       if (!string.IsNullOrWhiteSpace(mods))
       {
         var outputFilePath = Path.Combine(outputPath, $"{fileInfo.Name.Replace(".pdf", "")}{mods}.pdf");
@@ -334,29 +404,6 @@ namespace PeeDeeEffMagic
           this.WriteToOutput($"File saved as revision. File is at version: {document}");
         }
 
-        if (cBoxSign.Checked)
-        {
-          document.SignWithFile($"C:\\Users\\DFouche\\Documents\\Personal Docs\\Coding Exercises and tings\\MySignature.pfx",
-                                "bZQBjzHlm77YfhxuF6M2",
-                                null,
-                                SignaturePermissions.AdditionalSignaturesAndFormFillingAllowed);
-        }
-
-        if (cBoxExtractSignatures.Checked)
-        {
-          var signatures = document.GetVerifiedSignatures();
-          var revisedSignatures = document.GetVerifiedSignatures();
-
-          if (signatures != null && signatures.Count > 0)
-          {
-            this.WriteToOutput("Signatures found in document: ");
-            foreach (var signature in signatures)
-            {
-              this.WriteToOutput($"Signature: {signature.SignatureName} - {signature.SigningContact} - {signature.SigningDate}");
-            }
-          }
-        }
-
         if (cBoxConvertHtml.Checked)
         {
           var htmlFormatOptions = new HtmlFormatOptions();
@@ -376,6 +423,34 @@ namespace PeeDeeEffMagic
 
         document.SaveAs(outputFilePath, SaveAsRevision: false);
         this.WriteToOutput("File saved.");
+
+        if (cBoxSign.Checked)
+        {
+          if (this.signature != null)
+          {
+            // Sign and save PDF document
+            var digitalSignatureOutputPath = Path.Combine(outputFilePath, $"{fileInfo.Name.Replace(".pdf", "")}_digitallySigned{document}.pdf");
+
+            document.SaveAs(digitalSignatureOutputPath, SaveAsRevision: false);
+
+            this.signature.SignPdfFile(digitalSignatureOutputPath);
+
+            this.signature = null;
+          }
+          else
+          {
+            document.SignWithFile($"C:\\Users\\DFouche\\Documents\\Personal Docs\\Coding Exercises and tings\\MySignature.pfx",
+                                  "bZQBjzHlm77YfhxuF6M2",
+                                  null,
+                                  SignaturePermissions.AdditionalSignaturesAndFormFillingAllowed);
+
+            var revisionOutputPath = Path.Combine(outputFilePath, $"{fileInfo.Name.Replace(".pdf", "")}_revision{document}.pdf");
+
+            var signedPdf = document.SaveAsRevision(outputFilePath);
+
+            signedPdf.SaveAs(outputFilePath, SaveAsRevision: false);
+          }
+        }
 
         document.Dispose();
       }
@@ -536,7 +611,7 @@ namespace PeeDeeEffMagic
       {
         foreach (var field in form)
         {
-          csv += $"{field.Name},{(string.IsNullOrWhiteSpace(field.Value) ? "Empty Value" : field.Value)},{field.Type},{field.ReadOnly},{field.PageIndex + 1},\"X-{field.X}\",\"Y-{field.Y}\"{Environment.NewLine}";
+          csv += $"\"{field.Name}\",{(string.IsNullOrWhiteSpace(field.Value) ? "Empty Value" : $"\"{field.Value}\"")},{field.Type},{field.ReadOnly},{field.PageIndex + 1},\"X-{field.X}\",\"Y-{field.Y}\"{Environment.NewLine}";
         }
 
         var csvPath = Path.Combine(this.outputPath, $"{Path.GetFileNameWithoutExtension(this.filePath)}_fields.csv");

@@ -24,6 +24,7 @@ namespace PeeDeeEffMagic
     private string filePath;
     private string outputPath;
     private PdfSignature? signature;
+    private PdfDocument? document;
 
     #endregion
 
@@ -100,26 +101,34 @@ namespace PeeDeeEffMagic
       }
 
       var fileInfo = new FileInfo(this.filePath);
-      if (!fileInfo.Exists)
+
+      if (this.filePath.Contains("http"))
       {
-        MessageBox.Show("File does not exist.", "File Not Found");
-        this.WriteSectionBreak();
-        this.WriteToOutput("File does not exist. Ending process...");
-        return;
+        this.document = new PdfDocument(PdfUri: new Uri(this.filePath), TrackChanges: ChangeTrackingModes.EnableChangeTracking);
+      }
+      else
+      {
+        if (!fileInfo.Exists)
+        {
+          MessageBox.Show("File does not exist.", "File Not Found");
+          this.WriteSectionBreak();
+          this.WriteToOutput("File does not exist. Ending process...");
+          return;
+        }
+
+        this.document = new PdfDocument(PdfFilePath: this.filePath, TrackChanges: ChangeTrackingModes.EnableChangeTracking);
       }
 
       var mods = string.Empty;
 
       if (cBoxPreSave.Checked)
       {
-        PdfDocument preSavedDocument = new PdfDocument(PdfFilePath: this.filePath, TrackChanges: ChangeTrackingModes.EnableChangeTracking);
-        var preSaveOutputFilePath = Path.Combine(outputPath, $"{fileInfo.Name.Replace(".pdf", "")}_PreSaved.pdf");
+        var preSaveOutputFilePath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(this.filePath)}_PreSaved.pdf");
 
         this.filePath = preSaveOutputFilePath;
 
-        preSavedDocument = preSavedDocument.SaveAsRevision(preSaveOutputFilePath);
-        preSavedDocument.SaveAs(preSaveOutputFilePath, SaveAsRevision: false);
-        preSavedDocument.Dispose();
+        this.document = this.document.SaveAsRevision();
+        this.document = this.document.SaveAs(preSaveOutputFilePath, SaveAsRevision: false);
 
         this.WriteToOutput($"File presaved before updates made.");
 
@@ -133,13 +142,19 @@ namespace PeeDeeEffMagic
         }
       }
 
-      PdfDocument document = new PdfDocument(PdfFilePath: this.filePath, TrackChanges: ChangeTrackingModes.EnableChangeTracking);
+      if (this.document == null)
+      {
+        MessageBox.Show("File could not be opened.", "File Not Found");
+        this.WriteSectionBreak();
+        this.WriteToOutput("File could not be opened. Ending process...");
+        return;
+      }
 
       if (cBoxAddField.Checked)
       {
         var fieldsAdded = false;
         var signatureAdded = false;
-        var existingCheckbox = document.Form.FirstOrDefault(formField => formField.Type == PdfFormFieldType.Checkbox);
+        var existingCheckbox = this.document.Form.FirstOrDefault(formField => formField.Type == PdfFormFieldType.Checkbox);
         double? cBoxHeight = existingCheckbox != null ? existingCheckbox.Height : null;
         double? cBoxWidth = existingCheckbox != null ? existingCheckbox.Width : null;
 
@@ -147,7 +162,7 @@ namespace PeeDeeEffMagic
 
         while (addMoreFields)
         {
-          using (AddNewFieldForm addFieldForm = new AddNewFieldForm(document.PageCount,
+          using (AddNewFieldForm addFieldForm = new AddNewFieldForm(this.document.PageCount,
                                                                     cBoxHeight: cBoxHeight,
                                                                     cBoxWidth: cBoxWidth,
                                                                     alreadySigned: signatureAdded))
@@ -165,14 +180,14 @@ namespace PeeDeeEffMagic
               if (fieldType == "Text")
               {
                 var textField = new TextFormField(fieldName, fieldValue, pageIndex, fieldPos.Item1, fieldPos.Item2, width, height);
-                document.Form.Add(textField);
+                this.document.Form.Add(textField);
               }
               else if (fieldType == "CheckBox")
               {
                 var checkboxField = new CheckboxFormField(fieldName, fieldValue == "Yes" ? fieldValue : "Off", pageIndex, fieldPos.Item1, fieldPos.Item2, width, height);
 
                 checkboxField.DefaultAppearance = existingCheckbox != null ? existingCheckbox.DefaultAppearance : "";
-                document.Form.Add(checkboxField);
+                this.document.Form.Add(checkboxField);
               }
               else if (fieldType == "Signature")
               {
@@ -194,7 +209,7 @@ namespace PeeDeeEffMagic
                                                                  new Rectangle((int)fieldPos.Item1, (int)fieldPos.Item2, 100, 60));
 
                 //var signatureField = new SignatureFormField(fieldName, pageIndex, fieldPos.Item1, fieldPos.Item2, width, height);
-                //document.Form.Add(signatureField);
+                //this.document1.Form.Add(signatureField);
               }
 
               fieldsAdded = true;
@@ -227,7 +242,7 @@ namespace PeeDeeEffMagic
 
         List<string> allFieldNames = [];
 
-        foreach (var field in document.Form)
+        foreach (var field in this.document.Form)
         {
           allFieldNames.Add(field.Name);
         }
@@ -245,7 +260,7 @@ namespace PeeDeeEffMagic
 
         foreach (var fieldName in fieldsToEdit)
         {
-          var fieldToEdit = document.Form.FindFormField(fieldName);
+          var fieldToEdit = this.document.Form.FindFormField(fieldName);
           if (fieldToEdit != null)
           {
             if (fieldToEdit.Type == PdfFormFieldType.Textfield)
@@ -256,7 +271,7 @@ namespace PeeDeeEffMagic
                 {
                   var fieldValue = textInput.FieldValue;
                   this.WriteToOutput($"Field: {fieldName} - Value: {fieldValue}");
-                  var field = document.Form.FindFormField(fieldName);
+                  var field = this.document.Form.FindFormField(fieldName);
                   field.Value = fieldValue;
                 }
               }
@@ -269,7 +284,7 @@ namespace PeeDeeEffMagic
                 {
                   var fieldValue = checkBoxInput.FieldValue;
                   this.WriteToOutput($"Field: {fieldName} - Value: {fieldValue}");
-                  var field = document.Form.FindFormField(fieldName);
+                  var field = this.document.Form.FindFormField(fieldName);
                   field.Value = fieldValue;
                 }
               }
@@ -283,7 +298,7 @@ namespace PeeDeeEffMagic
             //      var fieldValue = checkBoxInput.FieldValue;
             //      this.WriteToOutput($"Field: {fieldName} - Sign (Y/N): {(fieldValue == "Yes" ? fieldValue : "No")}");
             //      cBoxSign.Checked = fieldValue == "Yes";
-            //      //var field = document.Form.FindFormField(fieldName);
+            //      //var field = this.document1.Form.FindFormField(fieldName);
             //      //field.Value = fieldValue;
             //    }
             //  }
@@ -299,19 +314,19 @@ namespace PeeDeeEffMagic
         this.WriteSectionBreak();
 
         this.WriteToOutput("Flattening form fields...");
-        document.Flatten();
+        this.document.Flatten();
         mods = $"{mods}_FlatIron";
       }
 
       if (cBoxFlattenPartial.Checked)
       {
         // TODO: expand to allow user to select which pages to flatten
-        PdfDocument flattenedPages = document.CopyPage(0);
-        PdfDocument unchangedPages = document.CopyPages([1, 2, 3]);
+        PdfDocument flattenedPages = this.document.CopyPage(0);
+        PdfDocument unchangedPages = this.document.CopyPages([1, 2, 3]);
 
         flattenedPages.Flatten();
 
-        document = PdfDocument.Merge(flattenedPages, unchangedPages);
+        this.document = PdfDocument.Merge(flattenedPages, unchangedPages);
         mods = $"{mods}_PartialFlatIron";
       }
 
@@ -319,14 +334,14 @@ namespace PeeDeeEffMagic
       {
         this.WriteSectionBreak();
         this.WriteToOutput("Exporting form fields to CSV...");
-        this.ExportToCsv(document);
+        this.ExportToCsv(this.document);
       }
 
       if (cBoxReadFields.Checked)
       {
         this.WriteSectionBreak();
         this.WriteToOutput("Reading form fields...");
-        this.WriteFieldsToOutput(document);
+        this.WriteFieldsToOutput(this.document);
       }
 
       if (cBoxReadonly.Checked)
@@ -336,7 +351,7 @@ namespace PeeDeeEffMagic
 
         List<string> allFieldNames = [];
 
-        foreach (var field in document.Form)
+        foreach (var field in this.document.Form)
         {
           allFieldNames.Add(field.Name);
         }
@@ -352,7 +367,7 @@ namespace PeeDeeEffMagic
           }
         }
 
-        this.SetFieldsToReadonly(document, fieldsToFlatten);
+        this.SetFieldsToReadonly(this.document, fieldsToFlatten);
         mods = $"{mods}_CustomFlatIron";
       }
 
@@ -368,8 +383,8 @@ namespace PeeDeeEffMagic
 
       if (cBoxExtractSignatures.Checked)
       {
-        var signatures = document.GetVerifiedSignatures();
-        var revisedSignatures = document.GetVerifiedSignatures();
+        var signatures = this.document.GetVerifiedSignatures();
+        var revisedSignatures = this.document.GetVerifiedSignatures();
 
         if (signatures != null && signatures.Count > 0)
         {
@@ -399,15 +414,15 @@ namespace PeeDeeEffMagic
 
         if (cBoxRevise.Checked)
         {
-          document = document.SaveAsRevision(outputFilePath);
+          this.document = this.document.SaveAsRevision(outputFilePath);
 
-          this.WriteToOutput($"File saved as revision. File is at version: {document}");
+          this.WriteToOutput($"File saved as revision. File is at version: {this.document}");
         }
 
         if (cBoxConvertHtml.Checked)
         {
           var htmlFormatOptions = new HtmlFormatOptions();
-          var documentHtmlString = document.ToHtmlString(fullContentWidth: true);
+          var documentHtmlString = this.document.ToHtmlString(fullContentWidth: true);
           var renderer = new ChromePdfRenderer();
           var htmlDocument = renderer.RenderHtmlAsPdf(documentHtmlString);
 
@@ -421,7 +436,7 @@ namespace PeeDeeEffMagic
 
         this.WriteToOutput($"Saving file to {outputFilePath}");
 
-        document.SaveAs(outputFilePath, SaveAsRevision: false);
+        this.document.SaveAs(outputFilePath, SaveAsRevision: false);
         this.WriteToOutput("File saved.");
 
         if (cBoxSign.Checked)
@@ -429,9 +444,9 @@ namespace PeeDeeEffMagic
           if (this.signature != null)
           {
             // Sign and save PDF document
-            var digitalSignatureOutputPath = Path.Combine(outputFilePath, $"{fileInfo.Name.Replace(".pdf", "")}_digitallySigned{document}.pdf");
+            var digitalSignatureOutputPath = Path.Combine(outputFilePath, $"{fileInfo.Name.Replace(".pdf", "")}_digitallySigned{this.document}.pdf");
 
-            document.SaveAs(digitalSignatureOutputPath, SaveAsRevision: false);
+            this.document.SaveAs(digitalSignatureOutputPath, SaveAsRevision: false);
 
             this.signature.SignPdfFile(digitalSignatureOutputPath);
 
@@ -439,20 +454,21 @@ namespace PeeDeeEffMagic
           }
           else
           {
-            document.SignWithFile($"C:\\Users\\DFouche\\Documents\\Personal Docs\\Coding Exercises and tings\\MySignature.pfx",
+            this.document.SignWithFile($"C:\\Users\\DFouche\\Documents\\Personal Docs\\Coding Exercises and tings\\MySignature.pfx",
                                   "bZQBjzHlm77YfhxuF6M2",
                                   null,
                                   SignaturePermissions.AdditionalSignaturesAndFormFillingAllowed);
 
-            var revisionOutputPath = Path.Combine(outputFilePath, $"{fileInfo.Name.Replace(".pdf", "")}_revision{document}.pdf");
+            var revisionOutputPath = Path.Combine(outputFilePath, $"{fileInfo.Name.Replace(".pdf", "")}_revision{this.document}.pdf");
 
-            var signedPdf = document.SaveAsRevision(outputFilePath);
+            var signedPdf = this.document.SaveAsRevision(outputFilePath);
 
             signedPdf.SaveAs(outputFilePath, SaveAsRevision: false);
           }
         }
 
-        document.Dispose();
+        this.document.Dispose();
+        this.document = null;
       }
       else
       {
@@ -514,10 +530,10 @@ namespace PeeDeeEffMagic
 
     private void SetFieldsToReadonly(PdfDocument document, string[] fieldNames)
     {
-      var font = document.Fonts.FirstOrDefault(font => font.Name.Contains("Arial") && font.Name.Contains("Bold") && font.Name.Contains("Italic"));
+      var font = this.document.Fonts.FirstOrDefault(font => font.Name.Contains("Arial") && font.Name.Contains("Bold") && font.Name.Contains("Italic"));
       var fontSize = font != null ? font.FontSize : 12;
 
-      if (document.Form.Count > 0)
+      if (this.document.Form.Count > 0)
       {
         if (cBoxReadFields.Checked)
         {
@@ -525,7 +541,7 @@ namespace PeeDeeEffMagic
           this.WriteToOutput("Reading form fields...");
         }
 
-        foreach (var field in document.Form)
+        foreach (var field in this.document.Form)
         {
           if (cBoxReadonly.Checked && Array.Exists(fieldNames, f => f == field.Name))
           {
@@ -549,10 +565,10 @@ namespace PeeDeeEffMagic
 
     private void ReplaceFieldsWithDrawnText(PdfDocument document, string[] fieldNames)
     {
-      var font = document.Fonts.FirstOrDefault(font => font.Name.Contains("Arial") && font.Name.Contains("Bold") && font.Name.Contains("Italic"));
+      var font = this.document.Fonts.FirstOrDefault(font => font.Name.Contains("Arial") && font.Name.Contains("Bold") && font.Name.Contains("Italic"));
       var fontSize = font != null ? font.FontSize : 12;
 
-      if (document.Form.Count > 0)
+      if (this.document.Form.Count > 0)
       {
         if (cBoxReadFields.Checked)
         {
@@ -562,7 +578,7 @@ namespace PeeDeeEffMagic
 
         foreach (var fieldName in fieldNames)
         {
-          var field = document.Form.FindFormField(fieldName);
+          var field = this.document.Form.FindFormField(fieldName);
 
           if (field != null)
           {
@@ -571,8 +587,8 @@ namespace PeeDeeEffMagic
             string utf8Value = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(fieldValue));
 
             // Create a text annotation at the same position (as a workaround)
-            document.DrawText(fieldValue, font, FontSize: fontSize, PageIndex: (int)field.PageIndex, X: field.X, Y: field.Y, Color: Color.Black, Rotation: 0.0);
-            document.Form.Remove(field);
+            this.document.DrawText(fieldValue, font, FontSize: fontSize, PageIndex: (int)field.PageIndex, X: field.X, Y: field.Y, Color: Color.Black, Rotation: 0.0);
+            this.document.Form.Remove(field);
 
             this.WriteToOutput($"Replacing field: {field.Name} with drawn text value: {field.Value}.");
           }
@@ -586,7 +602,7 @@ namespace PeeDeeEffMagic
 
     private void WriteFieldsToOutput(PdfDocument document)
     {
-      var form = document.Form;
+      var form = this.document.Form;
       if (form.Count > 0)
       {
         foreach (var field in form)
@@ -605,7 +621,7 @@ namespace PeeDeeEffMagic
 
     private void ExportToCsv(PdfDocument document)
     {
-      var form = document.Form;
+      var form = this.document.Form;
       var csv = $"Field Name,Value,Type,ReadOnly,Page No,X Pos,Y Pos{Environment.NewLine}";
       if (form.Count > 0)
       {
@@ -622,7 +638,7 @@ namespace PeeDeeEffMagic
 
     private void ExportUniqueToJson(PdfDocument document)
     {
-      var form = document.Form;
+      var form = this.document.Form;
       var fieldTypes = new List<PdfFormFieldType>();
       var json = $"{{\"UniqueFields\": [";
       if (form.Count > 0)
